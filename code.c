@@ -50,33 +50,58 @@ struct node * insert(struct node *root,char str[],int i,int win)
 	
 	return root;
 }
-struct winloss preorder(struct node *root)
+int preorder(struct node *root)
 {
 	int i=0;
-	int winstat=0,losstat=0;
-	struct winloss child_stat;
+	int winstat=1,losstat=0;
+	int child_stat;
 	for(i=0;i<26;i++)
 	{ 
 	  if(root->isleaf==1)
 	  {
 	  //	printf("leaf return(0,1)\n");
-	  	return (struct winloss){0,1};
+	  	return 1;
 	  }
 	  
  	  if(root->child[i]!=NULL)
 	  {
 	  child_stat=preorder(root->child[i]);	
 	  	
-	  	winstat=(winstat | !(child_stat.win));
-	  	losstat=(losstat | !(child_stat.loss));
-	  	if(winstat==1 && losstat==1)
+	  	winstat=winstat && child_stat;
+	  	if(winstat==0)
 		  {
-		  return (struct winloss){1,1};
+		  return 0;
           }
 	  }	
 	}
 	//printf("zz return(%d,%d)\n",winstat,losstat);
-	return (struct winloss){winstat,losstat};
+	return 1;
+//	printf("\n");
+}
+int canilose(struct node *root){
+	int i=0;
+	int winstat=1,losstat=0;
+	int child_stat;
+	for(i=0;i<26;i++)
+	{ 
+	  if(root->isleaf==1)
+	  {
+	  //	printf("leaf return(0,1)\n");
+	  	return 0;
+	  }
+	  
+ 	  if(root->child[i]!=NULL)
+	  {
+	  child_stat=preorder(root->child[i]);	
+	  	
+	  	if(child_stat==0)
+		  {
+		  return 1;
+          }
+	  }
+	}
+	//printf("zz return(%d,%d)\n",winstat,losstat);
+	return 0;
 //	printf("\n");
 }
 int main()
@@ -91,29 +116,32 @@ int main()
 	struct node *root=newnode();
 	for(i=0;i<n;i++)
 	{
-		scanf("%s",&str);
+		scanf("%s",str);
 		root=insert(root,str,0,win);
 	}
-	struct winloss st;
+	int st;
 	st=preorder(root);
 	//printf("wins %d loses %d\n",wins,loses);
-	if(st.win>0)
+	if(st)
 	{
-		if(st.loss>0)
-		{
-		printf("First\n");	
+	    if(k%2)
+		printf("First\n");
+		else{
+		if(canilose(root)){
+		
+		printf("First\n");
 		}
-		else
-		{
-		if(k%2==0)
+		else{
 		printf("Second\n");
-		else
-		printf("First\n");	
+		}	
 		}
 	}
 	else
 	{
+	    if(k%2)
 	    printf("Second\n");
+	    else
+	    printf("First\n");
 	}
 }
 
